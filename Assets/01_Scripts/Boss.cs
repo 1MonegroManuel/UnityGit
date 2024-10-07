@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Boss : MonoBehaviour
 {
-    public float MaxLife = 10;
+    public float MaxLife = 50;
     float life;
     public float damage = 2;
     public float speed = 1.5f;
@@ -20,6 +20,7 @@ public class Boss : MonoBehaviour
     Transform target;
     public Transform firePoint1;
     public Transform firePoint2;
+    public Transform firePoint3;
     public Bullet bulletPrefab;
     public GameObject explosionEffect;
     public List<GameObject> powerUpPrefabs;
@@ -68,7 +69,6 @@ public class Boss : MonoBehaviour
 
         if (life <= 0)
         {
-            Instantiate(explosionEffect, transform.position, transform.rotation);
             Destroy(gameObject);
         }
     }
@@ -98,6 +98,19 @@ public class Boss : MonoBehaviour
     {
         MoveOscillating();
         ShootStraight();
+
+        // Asegúrate de tener un componente SpriteRenderer en el GameObject
+        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            // Cambia el color del sprite a blanco
+            spriteRenderer.color = Color.white;
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer component not found on this GameObject.");
+        }
     }
 
     void Phase2Behavior()
@@ -105,14 +118,39 @@ public class Boss : MonoBehaviour
         speed = 4f;
         MoveOscillating();
         ShootSpread();  // Disparo en abanico
+        // Asegúrate de tener un componente SpriteRenderer en el GameObject
+        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            // Cambia el color del sprite a blanco
+            spriteRenderer.color = Color.yellow;
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer component not found on this GameObject.");
+        }
     }
 
     void Phase3Behavior()
     {
         speed = 4f;
         ExtraDamage = 3;
+        BulletSpeed = 10;
         MoveOscillating();
         ShootTargeted();  // Dispara directamente al jugador
+        // Asegúrate de tener un componente SpriteRenderer en el GameObject
+        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            // Cambia el color del sprite a blanco
+            spriteRenderer.color = Color.magenta;
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer component not found on this GameObject.");
+        }
     }
 
     void Phase4Behavior()
@@ -125,6 +163,18 @@ public class Boss : MonoBehaviour
         timeBtwShoot = 1f;
         MoveOscillating();
         ShootTargeted();
+        // Asegúrate de tener un componente SpriteRenderer en el GameObject
+        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null)
+        {
+            // Cambia el color del sprite a blanco
+            spriteRenderer.color = Color.red;
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer component not found on this GameObject.");
+        }
     }
 
     void MoveOscillating()
@@ -134,7 +184,7 @@ public class Boss : MonoBehaviour
         float oscillation = Mathf.Sin(oscillationTimer) * oscillationAmplitude;
         Vector3 pos = transform.position;
         pos.x = oscillation;
-        pos.y -= speed * Time.deltaTime;
+        //pos.y -= speed * Time.deltaTime;
         transform.position = pos;
     }
 
@@ -149,10 +199,13 @@ public class Boss : MonoBehaviour
             timer = 0;
             Bullet b1 = Instantiate(bulletPrefab, firePoint1.position, transform.rotation);
             Bullet b2 = Instantiate(bulletPrefab, firePoint2.position, transform.rotation);
+            Bullet b3 = Instantiate(bulletPrefab, firePoint3.position, transform.rotation);
             b1.speed = BulletSpeed * ExtraSpeed;
             b2.speed = BulletSpeed * ExtraSpeed;
+            b3.speed = BulletSpeed * ExtraSpeed;
             b1.damage = damage * ExtraDamage;
             b2.damage = damage * ExtraDamage;
+            b3.damage = damage * ExtraDamage;
         }
     }
 
@@ -168,9 +221,15 @@ public class Boss : MonoBehaviour
             for (int i = -2; i <= 2; i++)  // Dispara en abanico
             {
                 Quaternion spreadRotation = Quaternion.Euler(0, 0, i * 10); // Ajusta el ángulo
-                Bullet b = Instantiate(bulletPrefab, firePoint1.position, transform.rotation * spreadRotation);
-                b.speed = BulletSpeed * ExtraSpeed;
-                b.damage = damage * ExtraDamage;
+                Bullet b1 = Instantiate(bulletPrefab, firePoint1.position, transform.rotation * spreadRotation);
+                Bullet b2 = Instantiate(bulletPrefab, firePoint2.position, transform.rotation * spreadRotation);
+                Bullet b3 = Instantiate(bulletPrefab, firePoint3.position, transform.rotation * spreadRotation);
+                b1.speed = BulletSpeed * ExtraSpeed;
+                b2.speed = BulletSpeed * ExtraSpeed;
+                b3.speed = BulletSpeed * ExtraSpeed;
+                b1.damage = damage * ExtraDamage;
+                b2.damage = damage * ExtraDamage;
+                b3.damage = damage * ExtraDamage;
             }
         }
     }
@@ -187,10 +246,13 @@ public class Boss : MonoBehaviour
             Vector2 dir = (target.position - transform.position).normalized;
             Bullet b1 = Instantiate(bulletPrefab, firePoint1.position, Quaternion.LookRotation(Vector3.forward, dir));
             Bullet b2 = Instantiate(bulletPrefab, firePoint2.position, Quaternion.LookRotation(Vector3.forward, dir));
+            Bullet b3 = Instantiate(bulletPrefab, firePoint3.position, Quaternion.LookRotation(Vector3.forward, dir));
             b1.speed = BulletSpeed * ExtraSpeed;
             b2.speed = BulletSpeed * ExtraSpeed;
+            b3.speed = BulletSpeed * ExtraSpeed;
             b1.damage = damage * ExtraDamage;
             b2.damage = damage * ExtraDamage;
+            b3.damage = damage * ExtraDamage;
         }
     }
 

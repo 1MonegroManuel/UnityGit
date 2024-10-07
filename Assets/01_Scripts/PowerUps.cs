@@ -27,7 +27,7 @@ public class PowerUps : MonoBehaviour
                     p.extraDamage = 5f;
                     break;
                 case 1:
-                    p.ExtraSpeed = 5f;
+                    p.ExtraSpeed = 2f;
                     break;
                 case 2:
                     p.extraBulletSpeed = 10f;
@@ -36,7 +36,7 @@ public class PowerUps : MonoBehaviour
                     p.critic = true;
                     break;
                 case 4:
-                    p.timeBtwShoot = 0.5f;
+                    p.timeBtwShoot = 0f;
                     break;
                 case 5:
                     p.shield = true;

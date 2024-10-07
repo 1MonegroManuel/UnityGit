@@ -30,6 +30,36 @@ Transform:
   m_Father: {fileID: 8542717935849206514}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &9140808858200257483
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1984113794300695869}
+  m_Layer: 0
+  m_Name: FirepointC
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1984113794300695869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9140808858200257483}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.003, y: 0.314, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8542717935849206514}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &5742091157936391460
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -223,15 +253,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4124687921830934486, guid: 0536e7795ebcbbd428143d00d616b2dc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4124687921830934486, guid: 0536e7795ebcbbd428143d00d616b2dc, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4124687921830934486, guid: 0536e7795ebcbbd428143d00d616b2dc, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4124687921830934486, guid: 0536e7795ebcbbd428143d00d616b2dc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -314,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93ce7697b849f9f48b3c2a8aefb399a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxLife: 100
+  MaxLife: 150
   damage: 2
   speed: 1.5
   timeBtwShoot: 2
@@ -325,10 +355,11 @@ MonoBehaviour:
   dropChance: 50
   firePoint1: {fileID: 8542717936362826859}
   firePoint2: {fileID: 8194908522701242315}
+  firePoint3: {fileID: 1984113794300695869}
   bulletPrefab: {fileID: 8245047248661450957, guid: 930cd8d4cec483d45b79444cdeff9d54, type: 3}
   explosionEffect: {fileID: 0}
   powerUpPrefabs: []
   LifeBar: {fileID: 7859251963361986714}
-  currentPhase: 3
+  currentPhase: 0
   oscillationFrequency: 2
   oscillationAmplitude: 3
