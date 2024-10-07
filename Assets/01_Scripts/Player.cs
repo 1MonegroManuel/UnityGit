@@ -3,141 +3,129 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-
 public class Player : MonoBehaviour
 {
-    public float damage = 1f;
-    public float bulletSpeed = 7;
-    public float speed = 2f;
-    public float timeBtwShoot = 1.5f;
-    public float maxLife = 3;
+    public float MaxLife;
     float life = 3;
-    public int ammo = 5;
-    public float criticalChance = 0f;
-    int currentAmmo;
+    public float speed = 2f;
+    public float ExtraSpeed = 0f;
+    public float timeBtwShoot = 1.5f;
+    public int bullets = 5;
+    public float extraDamage = 0f;
+    public float damage= 5f;
+    public bool critic = false;
+    public float bulletSpeed= 10f;
+    public float extraBulletSpeed = 0f;
+    int currentBullets;
     float timer = 0;
+    float timer2 = 0;
+    public bool shield;
     bool canShoot = true;
-    public bool shield = false;
-    public float shieldTime = 5f;
-    public Rigidbody rb;
+    public Rigidbody2D rb;
     public Transform firePoint;
     public Bullet bulletPrefab;
     public Text lifeText;
     public Image lifeBar;
-
     void Start()
     {
         Debug.Log("Inició el juego");
-        currentAmmo = ammo;
-        life = maxLife;
-        lifeBar.fillAmount = life / maxLife;
+        currentBullets = bullets;
+        life = MaxLife;
+        lifeBar.fillAmount = life / MaxLife;
         lifeText.text = "Life = " + life;
     }
 
     void Update()
     {
-        Debug.Log("Juego en proceso");
+        Debug.Log("Juego en progreso");
         Movement();
         Reload();
-        CheckIfCanShoot();
+        CheckIfShoot();
         Shoot();
-    }
-
-    public void TakeDamage(float dmg)
-    {
-        if (!shield)
+        if (shield)
         {
-            life -= dmg;
-            lifeBar.fillAmount = life / maxLife;
-            lifeText.text = "Life = " + life;
-            if (life <= 0)
-            {
-                SceneManager.LoadScene("Game");
-                //Destroy(gameObject);
-            }
+            timer2 += Time.deltaTime;
         }
     }
 
     void Movement()
     {
         float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        rb.velocity = new Vector3(x, 0, z) * speed;
+        float y = Input.GetAxis("Vertical");
+        rb.velocity = new Vector2(x, y) * (speed+ExtraSpeed);
     }
 
     void Shoot()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && canShoot && currentAmmo > 0)
+        if(Input.GetKeyDown(KeyCode.Space) && canShoot && currentBullets > 0)
         {
             Bullet b = Instantiate(bulletPrefab, firePoint.position, transform.rotation);
-            if(Random.Range(0f, 1f) <= criticalChance)
+            if (critic)
             {
-                b.damage = damage * 2;
+                int prob = Random.Range(1, 10);
+                if (prob < 4)
+                {
+                    b.damage = (damage + extraDamage)*2;
+                }
+                else
+                {
+                    b.damage = damage + extraDamage;
+                }
             }
             else
             {
-                b.damage = damage;
+                b.damage = damage + extraDamage;
             }
-            b.speed = bulletSpeed;
-            currentAmmo--;
+            b.speed= bulletSpeed + extraBulletSpeed;
             canShoot = false;
+            currentBullets--;
         }
     }
 
     void Reload()
     {
-        if(currentAmmo == 0 && Input.GetKeyDown(KeyCode.R))
+        if(currentBullets == 0 && Input.GetKeyDown(KeyCode.R))
         {
-            currentAmmo = ammo;
+            currentBullets = bullets;
         }
     }
 
-    void CheckIfCanShoot()
+    public void TakeDamage(float dmg)
     {
-        if (timer < timeBtwShoot)
+        if (shield && timer2 < 6)
         {
-            timer += Time.deltaTime;
+            timer2 += Time.deltaTime;
         }
         else
         {
-            timer = 0;
-            canShoot = true;
+            timer2 = 0;
+            shield = false;
+            life -= dmg;
+            lifeBar.fillAmount = life / MaxLife;
+            lifeText.text = "Life = " + life;
         }
-    }
-
-    public void ApplyPowerUp(PowerUpType powerUp, float amount)
-    {
-        switch (powerUp)
+        
+        if (life <= 0)
         {
-            case PowerUpType.Damage:
-                damage += amount;
-                break;
-            case PowerUpType.MoveSpeed:
-                speed += amount;
-                break;
-            case PowerUpType.BulletSpeed:
-                bulletSpeed += amount;
-                break;
-            case PowerUpType.CriticalRate:
-                criticalChance = amount;//0.3f
-                break;
-            case PowerUpType.FireRate:
-                timeBtwShoot -= amount;
-                if(timeBtwShoot <= 0)
-                {
-                    timeBtwShoot = 0.1f;
-                }
-                break;
-            case PowerUpType.Shield:
-                StartCoroutine(ApplyShield());
-                break;
+            //Destroy(gameObject);
+            SceneManager.LoadScene("Game");
         }
     }
 
-    IEnumerator ApplyShield()
+    void CheckIfShoot()
     {
-        shield = true;
-        yield return new WaitForSeconds(shieldTime);
-        shield = false;
+        if (!canShoot)
+        {
+            if (timer < timeBtwShoot)
+            {
+                timer += Time.deltaTime;
+            }
+            else
+            {
+                timer = 0;
+                canShoot = true;
+            }
+        }
     }
+
 }

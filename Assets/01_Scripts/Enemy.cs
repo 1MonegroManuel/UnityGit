@@ -6,29 +6,31 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour
 {
     public EnemyType type;
-    public float maxLife = 3;
+    public float MaxLife = 10;
     float life = 3;
-    public float speed = 2;
+    public float damage = 1;
+    public float speed = 2f;
     public float timeBtwShoot = 1.5f;
-    public float damage = 1f;
-    public float bulletSpeed = 4;
+    public float BulletSpeed = 2f;
+    public int ExtraDamage = 1;
+    public int ExtraSpeed = 1;
+    public int scorePoints = 1;
     float timer = 0;
     public float range = 4;
+    public float dropChance = 30f;
     bool targetInRange = false;
     Transform target;
-    public Transform firePoint;
+    public Transform firePoint1;
     public Bullet bulletPrefab;
-    public float dropChance = 30f;
-    public List<GameObject> powerUps = new List<GameObject>();
     public GameObject explosionEffect;
-    public Image lifeBar;
-
+    public List<GameObject> powerUpPrefabs;
+    public Image LifeBar;
     void Start()
     {
         GameObject ship = GameObject.FindGameObjectWithTag("Player");
         target = ship.transform;
-        life = maxLife;
-        lifeBar.fillAmount = life / maxLife;
+        life = MaxLife;
+        LifeBar.fillAmount = life/MaxLife;
     }
 
     void Update()
@@ -40,13 +42,13 @@ public class Enemy : MonoBehaviour
                 break;
             case EnemyType.NormalShoot:
                 MoveForward();
-                Shoot();
+                Shoot(ExtraDamage,ExtraSpeed);
                 break;
             case EnemyType.Kamikase:
                 if (targetInRange)
                 {
                     RotateToTarget();
-                    MoveForward(2);
+                    MoveForward();
                 }
                 else
                 {
@@ -58,7 +60,7 @@ public class Enemy : MonoBehaviour
                 if (targetInRange)
                 {
                     RotateToTarget();
-                    Shoot();
+                    Shoot(ExtraDamage, ExtraSpeed);
                 }
                 else
                 {
@@ -68,44 +70,54 @@ public class Enemy : MonoBehaviour
                 break;
         }
     }
-
+    void OnTriggerEnter2D(UnityEngine.Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Floor"))
+        {
+            Enemy e = collision.gameObject.GetComponent<Enemy>();
+            Instantiate(explosionEffect, transform.position, transform.rotation);
+            Destroy(gameObject);
+        }
+    }
     public void TakeDamage(float dmg)
     {
         life -= dmg;
-        lifeBar.fillAmount = life / maxLife;
+        LifeBar.fillAmount = life / MaxLife;
         if (life <= 0)
         {
-            if(Random.Range(0f,100) <= dropChance)
+            Vector3 v = gameObject.transform.position;
+            if(Random.Range(0,100) <= dropChance)
             {
-                Instantiate(powerUps[Random.Range(0, powerUps.Count)],
-                    transform.position, transform.rotation);
+                int power = Random.Range(0, powerUpPrefabs.Count);
+                Instantiate(powerUpPrefabs[power], transform.position, transform.rotation);
             }
             Instantiate(explosionEffect, transform.position, transform.rotation);
+            Spawner.instance.AddScore(scorePoints);
             Destroy(gameObject);
         }
     }
 
     void MoveForward()
     {
-        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
     }
 
     void MoveForward(float m)
     {
-        transform.Translate(Vector3.forward * speed * m * Time.deltaTime);
+        transform.Translate(Vector2.up * speed * m * Time.deltaTime);
     }
 
     void RotateToTarget()
     {
-        Vector3 dir = target.position - transform.position;
-        float angleZ = Mathf.Atan2 (dir.x, dir.z) * Mathf.Rad2Deg + 0;
-        transform.rotation = Quaternion.Euler(0,angleZ, 0);
+        Vector2 dir = target.position - transform.position;
+        float angleZ = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg + 0;
+        transform.rotation = Quaternion.Euler(0 , 0, -angleZ);
     }
 
     void SearchTarget()
     {
-        float distance = Vector3.Distance(transform.position, target.position);
-        if(distance <= range)
+        float distance = Vector2.Distance(target.position, transform.position);
+        if (distance <= range)
         {
             targetInRange = true;
         }
@@ -115,39 +127,37 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void Shoot()
+    void Shoot(int x, int y)
     {
-        if (timer < timeBtwShoot)
+        if(timer < timeBtwShoot)
         {
             timer += Time.deltaTime;
         }
         else
         {
             timer = 0;
-            Bullet b = Instantiate(bulletPrefab, firePoint.position, transform.rotation);
-            b.speed = bulletSpeed;
-            b.damage = damage;
+            Bullet b=Instantiate(bulletPrefab, firePoint1.position, transform.rotation);
+            b.speed = BulletSpeed*y;
+            b.damage = damage*x;
+
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             Player p = collision.gameObject.GetComponent<Player>();
             p.TakeDamage(damage);
-            if (Random.Range(0f, 100) <= dropChance)
-            {
-                Instantiate(powerUps[Random.Range(0, powerUps.Count)],
-                    transform.position, transform.rotation);
-            }
             Destroy(gameObject);
-        }else if(collision.gameObject.CompareTag("Destroyer"))
+        }
+        if (collision.gameObject.CompareTag("Floor"))
         {
             Destroy(gameObject);
         }
     }
 }
+
 public enum EnemyType
 {
     Normal,
